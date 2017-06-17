@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
+#include "DrawDebugHelpers.h"
 
 // Do nothing just indicate that this parameter is used as an output
 #define OUT
@@ -50,6 +51,19 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		*(PlayerViewPointRotation.ToString ())
 	);
 
+	// Draw red trace in the world to visualize
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+	DrawDebugLine (
+		GetWorld (),
+		PlayerViewPointLocation,
+		LineTraceEnd,
+		FColor (255, 0, 0),
+		false,
+		0.0f,
+		0,
+		10.0f
+		);
+	
 	// Ray-cast out to reach distance
 
 	// See what we hit
