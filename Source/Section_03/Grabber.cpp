@@ -33,6 +33,15 @@ void UGrabber::BeginPlay()
 	if (!PhysicsHandle) {
 		UE_LOG (LogTemp, Error, TEXT ("%s - No PhysicsHandle found!"), *ObjectName);
 	}
+	/// Look for attached Input Component
+	InputComponent = GetOwner ()->FindComponentByClass<UInputComponent> ();
+	if (InputComponent) {
+		UE_LOG (LogTemp, Warning, TEXT ("%s - InputComponent found!"), *ObjectName);
+		/// Bind input axis
+		InputComponent->BindAction ("Grab", EInputEvent::IE_Pressed, this, &UGrabber::Grab);
+	} else {
+		UE_LOG (LogTemp, Error, TEXT ("%s - No InputComponent found!"), *ObjectName);
+	}
 }
 
 
@@ -90,5 +99,11 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		FString HitResult = ActorHit->GetName ();
 		UE_LOG (LogTemp, Warning, TEXT ("%s - line trace is hitting: %s"), *ObjectName, *HitResult);
 	}
+}
+
+void UGrabber::Grab ()
+{
+	FString ObjectName = GetOwner ()->GetName ();
+	UE_LOG (LogTemp, Warning, TEXT ("%s - Grab key pressed."), *ObjectName);
 }
 
