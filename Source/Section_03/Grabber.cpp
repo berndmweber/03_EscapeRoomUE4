@@ -27,6 +27,12 @@ void UGrabber::BeginPlay()
 
 	FString ObjectName = GetOwner ()->GetName ();
 	UE_LOG (LogTemp, Warning, TEXT ("%s - Grabber is reporting for duty!"), *ObjectName);
+
+	/// Look for attached Physics Handle
+	PhysicsHandle = GetOwner ()->FindComponentByClass<UPhysicsHandleComponent> ();
+	if (!PhysicsHandle) {
+		UE_LOG (LogTemp, Error, TEXT ("%s - No PhysicsHandle found!"), *ObjectName);
+	}
 }
 
 
@@ -45,11 +51,11 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	);
 	
 	FString ObjectName = GetOwner ()->GetName ();
-	UE_LOG (LogTemp, Warning, TEXT ("%s - Location: %s . Rotation: %s"), 
-		*ObjectName,
-		*(PlayerViewPointLocation.ToString ()),
-		*(PlayerViewPointRotation.ToString ())
-	);
+	//UE_LOG (LogTemp, Warning, TEXT ("%s - Location: %s . Rotation: %s"), 
+	//	*ObjectName,
+	//	*(PlayerViewPointLocation.ToString ()),
+	//	*(PlayerViewPointRotation.ToString ())
+	//);
 
 	/// Draw red trace in the world to visualize
 	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
