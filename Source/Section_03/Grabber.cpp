@@ -2,7 +2,11 @@
 
 #include "Grabber.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/PlayerController.h"
+#include "Engine/World.h"
 
+// Do nothing just indicate that this parameter is used as an output
+#define OUT
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
@@ -22,7 +26,6 @@ void UGrabber::BeginPlay()
 
 	FString ObjectName = GetOwner ()->GetName ();
 	UE_LOG (LogTemp, Warning, TEXT ("%s - Grabber is reporting for duty!"), *ObjectName);
-	
 }
 
 
@@ -31,6 +34,25 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	// Get player viewpoint this tick
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	GetWorld ()->GetFirstPlayerController ()->GetPlayerViewPoint (
+		OUT PlayerViewPointLocation,
+		OUT PlayerViewPointRotation
+	);
+	
+	FString ObjectName = GetOwner ()->GetName ();
+	UE_LOG (LogTemp, Warning, TEXT ("%s - Location: %s . Rotation: %s"), 
+		*ObjectName,
+		*(PlayerViewPointLocation.ToString ()),
+		*(PlayerViewPointRotation.ToString ())
+	);
+
+	// Ray-cast out to reach distance
+
+	// See what we hit
+
 }
 
