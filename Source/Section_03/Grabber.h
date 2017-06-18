@@ -36,4 +36,7 @@ private:
 
 	// Ray-case and grab what's in reach
 	void Grab ();
+
+	// Release what has been grabbed previously
+	void Release ();
 };

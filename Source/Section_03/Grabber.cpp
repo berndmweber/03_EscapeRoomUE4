@@ -39,6 +39,7 @@ void UGrabber::BeginPlay()
 		UE_LOG (LogTemp, Warning, TEXT ("%s - InputComponent found!"), *ObjectName);
 		/// Bind input axis
 		InputComponent->BindAction ("Grab", EInputEvent::IE_Pressed, this, &UGrabber::Grab);
+		InputComponent->BindAction ("Grab", EInputEvent::IE_Released, this, &UGrabber::Release);
 	} else {
 		UE_LOG (LogTemp, Error, TEXT ("%s - No InputComponent found!"), *ObjectName);
 	}
@@ -105,5 +106,11 @@ void UGrabber::Grab ()
 {
 	FString ObjectName = GetOwner ()->GetName ();
 	UE_LOG (LogTemp, Warning, TEXT ("%s - Grab key pressed."), *ObjectName);
+}
+
+void UGrabber::Release ()
+{
+	FString ObjectName = GetOwner ()->GetName ();
+	UE_LOG (LogTemp, Warning, TEXT ("%s - Grab key released."), *ObjectName);
 }
 
