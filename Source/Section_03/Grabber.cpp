@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
+#include "Components/PrimitiveComponent.h"
 #include "DrawDebugHelpers.h"
 
 // Do nothing just indicate that this parameter is used as an output
@@ -60,41 +61,42 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// if the pysics handle is attached
+	// if the physics handle is attached
+	if (PhysicsHandle->GrabbedComponent) {
+		FVector PlayerViewPointLocation;
+		FVector LineTraceEnd;
+
+		GetViewPointAndLineTraceEnd (
+			OUT PlayerViewPointLocation,
+			OUT LineTraceEnd
+		);
+
 		// move the object that we're holding
+		PhysicsHandle->SetTargetLocation (LineTraceEnd);
+	}
 
 }
 
 const FHitResult UGrabber::GetFirstPhysicsBodyInReach ()
 {
-	/// Get player viewpoint this tick
 	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
+	FVector LineTraceEnd;
 
-	// Need this to determine the line trace vector
-	GetWorld ()->GetFirstPlayerController ()->GetPlayerViewPoint (
+	GetViewPointAndLineTraceEnd (
 		OUT PlayerViewPointLocation,
-		OUT PlayerViewPointRotation
+		OUT LineTraceEnd
 	);
 
-	//UE_LOG (LogTemp, Warning, TEXT ("%s - Location: %s . Rotation: %s"), 
-	//	*DebugName,
-	//	*(PlayerViewPointLocation.ToString ()),
-	//	*(PlayerViewPointRotation.ToString ())
+	//DrawDebugLine (
+	//	GetWorld (),
+	//	PlayerViewPointLocation,
+	//	LineTraceEnd,
+	//	FColor (255, 0, 0),
+	//	false,
+	//	0.0f,
+	//	0,
+	//	10.0f
 	//);
-
-	/// Draw red trace in the world to visualize
-	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector () * Reach;
-	DrawDebugLine (
-		GetWorld (),
-		PlayerViewPointLocation,
-		LineTraceEnd,
-		FColor (255, 0, 0),
-		false,
-		0.0f,
-		0,
-		10.0f
-	);
 
 	/// Setup Query parameters
 	FCollisionQueryParams TraceParameters = FCollisionQueryParams (FName (TEXT ("")), false, GetOwner ());
@@ -110,14 +112,21 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach ()
 		TraceParameters
 	);
 
-	/// Debug only - See what we hit
-	AActor* ActorHit = LineTraceHit.GetActor ();
-	if (ActorHit) {
-		FString HitResult = ActorHit->GetName ();
-		UE_LOG (LogTemp, Warning, TEXT ("%s - line trace is hitting: %s"), *DebugName, *HitResult);
-	}
-
 	return LineTraceHit;
+}
+
+void UGrabber::GetViewPointAndLineTraceEnd (FVector &out_ViewPointLocation, FVector &out_LineTraceEnd)
+{
+	FRotator PlayerViewPointRotation;
+
+	// Need this to determine the line trace vector
+	GetWorld ()->GetFirstPlayerController ()->GetPlayerViewPoint (
+		OUT out_ViewPointLocation,
+		OUT PlayerViewPointRotation
+	);
+
+	/// Draw red trace in the world to visualize
+	out_LineTraceEnd = out_ViewPointLocation + PlayerViewPointRotation.Vector () * Reach;
 }
 
 void UGrabber::Grab ()
@@ -125,16 +134,26 @@ void UGrabber::Grab ()
 	UE_LOG (LogTemp, Warning, TEXT ("%s - Grab key pressed."), *DebugName);
 
 	/// Line Trace and try and reach any actors with physics body collision channel set
-	GetFirstPhysicsBodyInReach ();
+	auto HitResult = GetFirstPhysicsBodyInReach ();
+	auto ComponentToGrab = HitResult.GetComponent ();
+	auto ActorHit = HitResult.GetActor ();
 
 	/// If we hit something the attache a physics handle
-	// TODO Attach physics handle
+	if (ActorHit) {
+		// Attach physics handle
+		PhysicsHandle->GrabComponentAtLocationWithRotation (
+			ComponentToGrab,
+			NAME_None,
+			ComponentToGrab->GetOwner ()->GetActorLocation (),
+			FRotator(0.0f)
+		);
+	}
 }
 
 void UGrabber::Release ()
 {
 	UE_LOG (LogTemp, Warning, TEXT ("%s - Grab key released."), *DebugName);
 
-	// TODO Release physics handle
+	PhysicsHandle->ReleaseComponent ();
 }
 
