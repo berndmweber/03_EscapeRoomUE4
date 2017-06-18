@@ -15,8 +15,6 @@ UOpenDoor::UOpenDoor()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 // Called when the game starts
@@ -25,16 +23,24 @@ void UOpenDoor::BeginPlay()
 	Super::BeginPlay();
 
 	Owner = GetOwner ();
+
+	if (PressurePlate == nullptr) {
+		UE_LOG (LogTemp, Error, TEXT ("%s - No PressurePlate defined!"), *(Owner->GetName ()));
+	}
 }
 
 void UOpenDoor::OpenDoor ()
 {
-	Owner->SetActorRotation (FRotator (0.0f, OpenAngle, 00.0f));
+	if (Owner) {
+		Owner->SetActorRotation (FRotator (0.0f, OpenAngle, 00.0f));
+	}
 }
 
 void UOpenDoor::CloseDoor ()
 {
-	Owner->SetActorRotation (FRotator (0.0f, 0.0f, 00.0f));
+	if (Owner) {
+		Owner->SetActorRotation (FRotator (0.0f, 0.0f, 00.0f));
+	}
 }
 
 // Called every frame
@@ -61,12 +67,13 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate ()
 
 	// Find all the overlapping actors
 	TArray<AActor*> OverlappingActors;
-	PressurePlate->GetOverlappingActors (OUT OverlappingActors);
+	if (PressurePlate) {
+		PressurePlate->GetOverlappingActors (OUT OverlappingActors);
+	}
 
 	// Iterate through them adding their masses
 	for (const auto* OverlappingActor : OverlappingActors) {
 		float ActorMass = OverlappingActor->FindComponentByClass<UPrimitiveComponent> ()->GetMass ();
-		UE_LOG (LogTemp, Warning, TEXT ("%s on pressure plate with mass: %f!"), *(OverlappingActor->GetName()), ActorMass);
 		TotalMass += ActorMass;
 	}
 

@@ -58,6 +58,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (PhysicsHandle == nullptr) { return; }
+
 	// if the physics handle is attached
 	if (PhysicsHandle->GrabbedComponent) {
 		FVector LineTraceStart; // Unused in this function
@@ -123,16 +125,20 @@ void UGrabber::Grab ()
 	/// If we hit something the attache a physics handle
 	if (ActorHit) {
 		// Attach physics handle
-		PhysicsHandle->GrabComponentAtLocationWithRotation (
-			ComponentToGrab,
-			NAME_None, // No Bones needed
-			ComponentToGrab->GetOwner ()->GetActorLocation (),
-			FRotator(0.0f) // No rotation
-		);
+		if (PhysicsHandle) {
+			PhysicsHandle->GrabComponentAtLocationWithRotation (
+				ComponentToGrab,
+				NAME_None, // No Bones needed
+				ComponentToGrab->GetOwner ()->GetActorLocation (),
+				FRotator (0.0f) // No rotation
+			);
+		}
 	}
 }
 
 void UGrabber::Release ()
 {
-	PhysicsHandle->ReleaseComponent ();
+	if (PhysicsHandle) {
+		PhysicsHandle->ReleaseComponent ();
+	}
 }
