@@ -31,8 +31,19 @@ private:
 	float Reach = 100.0f;
 	
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
-
 	UInputComponent* InputComponent = nullptr;
+
+	// Used for debug output
+	FString DebugName;
+
+	// Get the first physics body in reach
+	const FHitResult GetFirstPhysicsBodyInReach ();
+
+	// Find attached physics handle
+	void FindPhysicsHandleComponent ();
+
+	// Setup attached input component
+	void SetupInputComponent ();
 
 	// Ray-case and grab what's in reach
 	void Grab ();
