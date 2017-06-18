@@ -36,7 +36,8 @@ private:
 	// Used for debug output
 	FString DebugName;
 
-	void GetViewPointAndLineTraceEnd (FVector &out_ViewPointLocation, FVector &out_LineTraceEnd);
+	// Get the Trace Line start and end vectors
+	void GetReachLineStartAndEnd (FVector&, FVector&);
 
 	// Get the first physics body in reach
 	const FHitResult GetFirstPhysicsBodyInReach ();
