@@ -39,7 +39,9 @@ private:
 	float DoorCloseDelay = 1.0f;
 
 	float LastDoorOpenTime;
-	
-	AActor* ActorThatOpens;  // Pawn inherits from Actor
+
 	AActor* Owner;
+
+	// Returns total mass in kilograms
+	float GetTotalMassOfActorsOnPlate ();
 };
